@@ -5,19 +5,39 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
-
+//const session = require("express-session");
+var bodyParser = require('body-parser');
+var multer = require('multer');
+var upload = multer();
+var cors = require('cors')
 var app = express();
+/* 
+const sessionMiddleware = session({
+  resave: true,
+  saveUninitialized: true,
+  secret: "secret",
+  cookie: {
+    maxAge: 30 * 24 * 60 * 60 * 1000
+  }
+}); */
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//app.use(sessionMiddleware);
+// for parsing application/json
+app.use(bodyParser.json()); 
+// for parsing application/xwww-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));  
+// for parsing multipart/form-data
+app.use(upload.array()); 
+app.use(cors())
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
 
@@ -25,6 +45,7 @@ app.use('/api', apiRouter);
 app.use(function(req, res, next) {
   next(createError(404));
 });
+
 
 // error handler
 app.use(function(err, req, res, next) {
